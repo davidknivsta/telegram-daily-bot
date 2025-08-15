@@ -116,8 +116,7 @@ def send_telegram_message(bot_token, chat_id, message):
 def is_within_target_time():
    """
    Kontrollera om det är rätt tid att skicka meddelandet
-   Cron-jobb körs 14:30 och 15:30 UTC
-   Måltid: 17:30 svensk tid (16:30/15:30 UTC beroende på säsong)
+   Måltid: 19:54 svensk tid (18:54/17:54 UTC beroende på säsong)
    """
    stockholm_tz = pytz.timezone('Europe/Stockholm')
    utc_tz = pytz.timezone('UTC')
@@ -127,7 +126,7 @@ def is_within_target_time():
    
    # Måltid i svensk tid
    target_hour = 19
-   target_minute = 55
+   target_minute = 54
    
    print(f"🕐 Svensk tid nu: {now_stockholm.strftime('%H:%M:%S')}")
    print(f"🌍 UTC tid nu: {now_utc.strftime('%H:%M:%S')}")
