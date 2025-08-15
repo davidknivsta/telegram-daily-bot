@@ -113,11 +113,56 @@ def send_telegram_message(bot_token, chat_id, message):
         print(f"❌ Nätverksfel: {e}")
         return False
 
+def is_within_target_time():
+   """
+   Kontrollera om det är rätt tid att skicka meddelandet
+   Cron-jobb körs 14:30 och 15:30 UTC
+   Måltid: 17:30 svensk tid (16:30/15:30 UTC beroende på säsong)
+   """
+   stockholm_tz = pytz.timezone('Europe/Stockholm')
+   utc_tz = pytz.timezone('UTC')
+   
+   now_stockholm = datetime.now(stockholm_tz)
+   now_utc = datetime.now(utc_tz)
+   
+   # Måltid i svensk tid
+   target_hour = 19
+   target_minute = 55
+   
+   print(f"🕐 Svensk tid nu: {now_stockholm.strftime('%H:%M:%S')}")
+   print(f"🌍 UTC tid nu: {now_utc.strftime('%H:%M:%S')}")
+   print(f"🎯 Måltid: {target_hour:02d}:{target_minute:02d} svensk tid")
+   
+   # Kontrollera om vi är inom 40 minuter från måltiden
+   current_time = now_stockholm.time()
+   target_time = time(target_hour, target_minute)
+   
+   # Konvertera till minuter för enklare jämförelse
+   current_minutes = current_time.hour * 60 + current_time.minute
+   target_minutes = target_time.hour * 60 + target_time.minute
+   
+   # Beräkna skillnad
+   time_diff = abs(current_minutes - target_minutes)
+   
+   print(f"⏱️ Tidsskillnad från måltid: {time_diff} minuter")
+   
+   if time_diff <= 40:
+       print("✅ Inom 40 minuter från måltid - fortsätter!")
+       return True
+   else:
+       print("❌ För långt från måltid - avslutar")
+       return False
+
 def main():
     """
     Huvudfunktion som körs av GitHub Actions
     """
     print("🚀 Startar daglig bot...")
+    
+    # Kontrollera om det är rätt tid att köra
+    if not is_within_target_time():
+        print("⏭️ Schemaläggningskontroll misslyckades - avslutar")
+        exit(0)  # Exit utan fel (normal avslutning)
     
     # Hämta secrets från GitHub Actions miljövariabler
     bot_token = os.getenv('BOT_TOKEN')
